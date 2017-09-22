@@ -4,7 +4,7 @@
 #include<stdbool.h>
 #include<string.h>
 #define DIMHASH 3
-//versione con rehashing finale al 12/09 ore 11:57
+//final version with re-hashing of the hashtable 
 typedef struct hashtable_s{ //hashtable type 
 	
 	void *indirizzo;
@@ -16,27 +16,27 @@ typedef struct elem_s{ //node type
 	char *nome; //name of the element
 	char *contenuto;//if the element is a file this is the pointer to the written string
 	hashtable_t *array;//if the element is a foldier this is the pointer of the hash table
-	uint16_t dim_array;
+	uint16_t dim_array;//dimension of the hashtable
 	struct elem_s *prec;//I've used open hashing  so this is the pointer to the previous element in the list
 	struct elem_s *next;//pointer to the following element 
 }elem_t;
-void create(char *, elem_t *root);//fatta function of create command
-void create_dir(char *, elem_t *root);//fatta function of create_dir command
-void read(char *, elem_t *root);//fatta funciont of read command
-void write_infile(char *, char *,elem_t * root);//fatta function of write command
-void del(char*, elem_t * root);//fatta function of delete command 
-void del_r(char *, elem_t * root);//fatta function of delete_dir command
-void find(char *,elem_t * root);//fatta function of find command
-elem_t *findpath(elem_t *root, char *arg, int *index,int *key, char *nome);//fatto this function returns the pointer to the father element so it's possible insert a new element in the correct cell of the hash table
-elem_t *create_root(void);//fatta this function create the root folder
-elem_t *searchinlist(elem_t * figlio, char*nome);//fatta this function flows a list and return the pointer to the element that his name is equal to the argument nome
-void free_subdir(elem_t*,bool);//fatta this function deletes all elements in a folder 
-void free_all(elem_t*);//fatta this function clears all the elements in the "file system"
-int compare(const void *a, const void *b);//fatta 
-char ** search(elem_t *,char *,char **array_string, int *,char *,int*);//fattasearch this function helps the function find. It's recursive and returns the pointer to an array of strings. These strings are the path to the searched element  
-char** aggiungi_string(char *string, int *indice, char **array_string, int *dim_array,char *nome); //fatta this function puts the path of the found element in the array 
+void create(char *, elem_t *root);//function of create command
+void create_dir(char *, elem_t *root);//function of create_dir command
+void read(char *, elem_t *root);//funciont of read command
+void write_infile(char *, char *,elem_t * root);//function of write command
+void del(char*, elem_t * root);//function of delete command 
+void del_r(char *, elem_t * root);//function of delete_dir command
+void find(char *,elem_t * root);//function of find command
+elem_t *findpath(elem_t *root, char *arg, int *index,int *key, char *nome);//this function returns the pointer to the father element so it's possible insert a new element in the correct cell of the hash table
+elem_t *create_root(void);//this function create the root folder
+elem_t *searchinlist(elem_t * figlio, char*nome);//this function flows a list and return the pointer to the element that his name is equal to the argument nome
+void free_subdir(elem_t*,bool);//this function deletes all elements in a folder 
+void free_all(elem_t*);//this function clears all the elements in the "file system"
+int compare(const void *a, const void *b);//compare function
+char ** search(elem_t *,char *,char **array_string, int *,char *,int*);// this function helps the function find. It's recursive and returns the pointer to an array of strings. These strings are the path to the searched element  
+char** aggiungi_string(char *string, int *indice, char **array_string, int *dim_array,char *nome); //this function puts the path of the found element in the array 
 int hash_function(char *string, uint16_t dim_array);//hash function jenkins
-hashtable_t *rehash(hashtable_t *old_array, uint16_t dim_array, elem_t * elem);
+hashtable_t *rehash(hashtable_t *old_array, uint16_t dim_array, elem_t * elem);//rehashing function
 int main(int argc, char *argv)
 {
     char *comando, *percorso, *argomento;
@@ -112,7 +112,7 @@ int main(int argc, char *argv)
 		}
 		else
    			{
-   				//printf("stringa non riconosciuta\n");
+   				printf("stringa non riconosciuta\n");
 			   free(stringa);
 			   break;
 			   }
@@ -123,7 +123,7 @@ int main(int argc, char *argv)
   	//printf("fine");
   	free_all(root);
   	}else{
-  		//printf("errore creazione root");
+  		printf("errore creazione root");
 	  }
   	
 	return 0;
@@ -239,7 +239,7 @@ void create_dir(char *argomento, elem_t * root)
 				 newelem->array=(hashtable_t*)calloc(DIMHASH,sizeof(hashtable_t));
 				 if(newelem->array==NULL)
 				 {
-				 	//printf("errore allocazione array in create_dir\n");
+				 	printf("errore allocazione array in create_dir\n");
 					free(newelem);				 	
 					goto error_exit;
 				 }
@@ -306,14 +306,14 @@ void read(char *argomento, elem_t *root)
 			}    
 	  	 }else
 	  	 {
-	  	 	//printf("file non trovato\n");
+	  	 	printf("file non trovato\n");
 	  	 	goto error_exit;}
  	}else
 	{
 		goto error_exit;
 	}
 	if(file->foc!=3){
-		//printf("non file\n");
+		printf("non file\n");
 		goto error_exit;}
     if (file->contenuto==NULL)
 	{
@@ -361,7 +361,7 @@ void write_infile(char *percorso, char *stringa,elem_t *root)
 	{
 		goto error_exit;}
 	if(file->foc!=3){
-		//printf("non file\n");
+		printf("non file\n");
 		goto error_exit;}
 	if(contenuto=(char*)malloc(strlen(stringa)*sizeof(char)))	{
 	for(n=0,m=1; stringa[m]!='"';m++,n++)
@@ -395,13 +395,13 @@ void del(char *argomento, elem_t *root)
 	   if(padre->array[index].indirizzo!=NULL){ 
 	
 	   	figlio=padre->array[index].indirizzo;
-		//printf("prima di strcmp figlio->nome %s\n",figlio->nome);	    
+		
 		if(strcmp(figlio->nome,nome)==0)
 	   	{
-				//printf("dopo di strcmp figlio->nome %s\n",figlio->nome);   	
+				  	
 				del=figlio;
 	   			if(del->foc==1){
-	   				//printf("elemento non cancellabile\n");
+	   				printf("elemento non cancellabile\n");
 	   				free(nome);
 					printf("no\n");
 	   				return;
@@ -410,18 +410,18 @@ void del(char *argomento, elem_t *root)
 			
 			   padre->array[index].indirizzo=NULL;
 		       
-		            //printf("fine primo if\n");
+		           
 			   }
 		       else
 		       {
 		       	padre->array[index].indirizzo=figlio->next;
 			    tmp=figlio->next;
 			    tmp->prec=padre;
-			    //printf("fine else\n");				  
+			   			  
  }
 			}
 		  else if(figlio->next!=NULL){
-			//printf("dentro else if figlio->next!=NULL\n"); //pericoloso			   	
+					   	
 			del=searchinlist(figlio,nome);
 					   	
 			if(del==NULL)
@@ -429,20 +429,20 @@ void del(char *argomento, elem_t *root)
 		   	goto error_exit;
 			   }
 			if(del->foc==1){
-	   				//printf("elemento non cancellabile\n");
+	   				printf("elemento non cancellabile\n");
 	   				goto error_exit;}
-			//printf("prima riordino ind\n");
+			
 			tmp=del->prec;
 		   	tmp->next=del->next;
 		   	if(del->next!=NULL){
 		   		tmp=del->next;
 		   		tmp->prec=del->prec;
 			   }
-			//printf("dopo riordino dei indirizzi\n");		   
+					   
 			}
 		else 
 		   {
-		   	//printf("file non trovato\n");
+		   	printf("file non trovato\n");
 		   	goto error_exit; }
 	  	}else
 	  	 {
@@ -452,11 +452,10 @@ void del(char *argomento, elem_t *root)
 	{
 		goto error_exit;}
 	if(del->foc==0){
-				//printf("prima del->array\n");			    	
+					    	
 				free(del->array);
 			    	free(del->nome);
-			    	//printf("prima free del \n");
-					free(del);
+		                free(del);
 			    	
 				}else if(del->foc==3){
 					free(del->contenuto);
@@ -489,7 +488,7 @@ void del_r(char *argomento,elem_t *root)
 	nome=(char *)malloc(10*sizeof(char));
 	if(padre=findpath(root,argomento,&index,&localkey,nome))
 	{ 
-	   if(padre->array[index].indirizzo!=NULL){ //rivedere local key si pu\F2 fare anche solo con index
+	   if(padre->array[index].indirizzo!=NULL){ 
 	   	figlio=padre->array[index].indirizzo;
 	   	 if(strcmp(figlio->nome,nome)==0)
 	   	{
@@ -586,7 +585,7 @@ char **search(elem_t *elem, char *string, char **array_string, int *indice, char
 	dim_string=strlen(string)+1;
 	tmp=(char *)malloc(dim_string*sizeof(char));
 	strcpy(tmp,string);
-		//printf("nome elem %s", elem->nome);						
+							
 	if(strcmp(elem->nome,cercato)==0)
 		{
 						
@@ -648,10 +647,9 @@ elem_t *searchinlist(elem_t * figlio, char*nome)
 	elem_t *tmp;
 	for(tmp=figlio; tmp;tmp=tmp->next)
 		   	{
-		   		//debug
-		   		//printf("%s\n",tmp->nome);
+		   		
 		   		if(strcmp(tmp->nome,nome)==0)
-		   		{//printf("fine searchinlist\n");
+		   		{
 		   			return tmp;
 				   }
 			   }
@@ -754,9 +752,8 @@ elem_t *findpath(elem_t *root, char *arg, int *index,int *key, char *nome)
     padre=padre->array[*index].indirizzo;
     if(padre==NULL)
     {
-    	//printf("si sta tentando di accedere a un elemento o non presente o non corretto\n");
-    	//printf("non trovato gi\E0 nell'array'\n");
-    	//printf("%d\n",*index);
+    	printf("si sta tentando di accedere a un elemento o non presente o non corretto\n");
+    	
 		free(string);
 		return NULL;
 	}
@@ -764,7 +761,7 @@ elem_t *findpath(elem_t *root, char *arg, int *index,int *key, char *nome)
 	{
 		if(padre->next!=NULL)
 		{
-			//printf("%s\n",padre->nome);
+			
 			padre=searchinlist(padre,string);
 			if(padre==NULL)
 			{
@@ -790,7 +787,7 @@ elem_t *findpath(elem_t *root, char *arg, int *index,int *key, char *nome)
 	{
 		nome=(char *)realloc(nome,dim_nome*sizeof(char));
 	}
-	//nome=(char *)malloc(dim_nome*sizeof(char));
+	
 	if(primo[dim_nome-1]=='\n'){
 	strncpy(nome,primo+1,dim_nome-2);
 	nome[dim_nome-2]='\0';
